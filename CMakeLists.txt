@@ -4,10 +4,6 @@ project(DemoChip8)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-set(SOURCE_FILE "${CMAKE_SOURCE_DIR}/SDL2/SDL2.dll")
-set(SD2_DLL_DESTINATION "${CMAKE_SOURCE_DIR}/build")
-set(FILENAME "SDL2.dll")
-
 set(SDL2_PATH "SDL2/x86_64-w64-mingw32")
 find_package(SDL2 REQUIRED)
 
