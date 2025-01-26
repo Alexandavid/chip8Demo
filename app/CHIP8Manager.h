@@ -28,14 +28,6 @@ class CHIP8Manager {
     GraphicsManager gui;
     uint16_t instruction{};
     uint16_t PCRegisterRecord = SDL_MAX_UINT16;
-    // SDLManager sdlManager;
-    // Window window;
-    // Renderer renderer;
-
-
-    // uint32_t screenWidth, screenHeight;
-    // std::array<std::array<uint8_t, CHIP8_WIDTH>, CHIP8_HEIGHT> framebuffer = {0};
-    std::array<uint8_t, KEYCOUNT> keys{};
 
 
 public:
