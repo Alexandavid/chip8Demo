@@ -1,40 +1,42 @@
 #ifndef CHIP8_MANAGER_H
 #define CHIP8_MANAGER_H
 
-
 #include <array>
 #include <cstdint>
 #include <random>
 #include "constants.h"
+#include "Peripherials/AudioManager.h"
 #include "Peripherials/GraphicsManager.h"
 #include "Peripherials/KeyboardHandler.h"
 
 class CHIP8Specification {
 
 public:
-    uint8_t memory[4 * KB];
-    uint16_t PC; // Program counter
+    uint8_t memory[4 * KB];     // ROM OF 4KB
+    uint16_t PC;                // Program counter
     uint8_t V[NUM_OF_REGISTER]; // General purpose 8-bit registers
-    uint16_t I; // Memory address register
+    uint16_t I;                 // Memory address register
     uint8_t delayTimerRegister;
     uint8_t soundRegister;
-    uint16_t stack[STACK_SIZE]; // Stack for subroutines
-    uint8_t sp; // Stack pointer
+    uint16_t stack[STACK_SIZE];  // Stack for subroutines
+    uint8_t sp;                  // Stack pointer
     uint8_t frame[DISPLAY_SIZE]; // Display frame buffer
 };
 
 class CHIP8Manager {
+public:
+    CHIP8Specification context;
+private:
     KeyboardHandler keypad;
     GraphicsManager gui;
+    AudioManager audio;
     uint16_t instruction{};
     uint16_t PCRegisterRecord = SDL_MAX_UINT16;
 
-
 public:
-    CHIP8Specification context;
     bool systemStatus = RUNNING;
 
-    CHIP8Manager(const char *title, uint32_t width, uint32_t height);
+    CHIP8Manager(const char *title, uint32_t width, uint32_t height, const char* soundfile);
 
     ~CHIP8Manager();
 
