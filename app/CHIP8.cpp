@@ -1,6 +1,8 @@
 #include "CHIP8Manager.h"
 #include <fstream>
+#include <functional>
 #include <iostream>
+#include <unordered_map>
 #include <Windows.h>
 #include <sys/stat.h>
 
@@ -8,7 +10,7 @@ CHIP8Manager::CHIP8Manager(
     const char *title
     , uint32_t width
     , uint32_t height
-    ) : context(), gui(title, width, height) {}
+    ) : gui(title, width, height), context() {}
 
 CHIP8Manager::~CHIP8Manager() = default;
 
@@ -182,15 +184,9 @@ void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
 
     switch ((instruction & 0xF000) >> 12) {
         case 0x0:
-            if (instruction == CLEAR_DISPLAY) {
-                gui.clearDisplay();
-
-            } else if (instruction == RET) {
-                // context.sp--;
-                context.PC = context.stack[--context.sp];
-            } else {
-                std::cerr << "Error: Invalid Instruction" << std::endl;
-            }
+            instruction == CLEAR_DISPLAY ? gui.clearDisplay()
+            : instruction == RET ? context.PC = context.stack[--context.sp]
+            : std::cerr << "Error: Invalid Instruction" << std::endl;
             break;
 
         case JP_ADDR:

@@ -6,7 +6,7 @@
 #include "CHIP8Manager.h"
 
 #define ONE_SECOND 1000
-#define CHIP8_FREQUENCY 120 //Hz
+#define CHIP8_FREQUENCY 60 //Hz
 #define SCREEN_REFRESH_RATE 60
 
 void chip8demo_app();
@@ -30,7 +30,7 @@ int main() {
 
 
 void chip8demo_app() {
-    const char *romFile = "../roms/6-keypad.ch8";
+    const char *romFile = "../games/TicTacToe.ch8";
     const int frameDelay = ONE_SECOND / CHIP8_FREQUENCY;
     const int screenUpdateDelay = ONE_SECOND / SCREEN_REFRESH_RATE;
     uint32_t lastTime = SDL_GetTicks();
