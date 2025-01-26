@@ -2,7 +2,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <unordered_map>
 #include <Windows.h>
 #include <sys/stat.h>
 
@@ -10,7 +9,8 @@ CHIP8Manager::CHIP8Manager(
     const char *title
     , uint32_t width
     , uint32_t height
-    ) : gui(title, width, height), context() {}
+    , const char* soundFile
+    ) : context(), gui(title, width, height), audio(soundFile) {}
 
 CHIP8Manager::~CHIP8Manager() = default;
 
@@ -184,9 +184,13 @@ void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
 
     switch ((instruction & 0xF000) >> 12) {
         case 0x0:
-            instruction == CLEAR_DISPLAY ? gui.clearDisplay()
-            : instruction == RET ? context.PC = context.stack[--context.sp]
-            : std::cerr << "Error: Invalid Instruction" << std::endl;
+            if (CLEAR_DISPLAY == instruction) {
+                gui.clearDisplay();
+            } else if (instruction == RET) {
+                context.PC = context.stack[--context.sp];
+            } else {
+                std::cerr << "Error: Invalid Instruction" << std::endl;
+            }
             break;
 
         case JP_ADDR:
@@ -249,22 +253,13 @@ void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
     }
 }
 
-void CHIP8Manager::handleSpecialRegisters() {
-    if (context.delayTimerRegister > 0) {
-        --context.delayTimerRegister;
-    }
 
-    if (context.soundRegister > 0)
-    {
-        --context.soundRegister;
-        PlaySound(TEXT("..\\audio\\beep.wav"), NULL, SND_FILENAME |  SND_LOOP | SND_ASYNC);
-    } else {
-        PlaySound(NULL, NULL, 0);
-    }
+void CHIP8Manager::handleSpecialRegisters() {
+    context.delayTimerRegister > 0 ? --context.delayTimerRegister : NULL;
+    context.soundRegister > 0 ? audio.playSound(&context.soundRegister, SND_FILENAME | SND_LOOP | SND_ASYNC) : audio.stopSound();
 }
 
 void CHIP8Manager::holdUntilClick(uint8_t regAddress) {
-
     keypad.wasAnyKeyPressed(&systemStatus, context.V, regAddress);
 
     if (systemStatus == HALT) {

@@ -10,7 +10,7 @@ void GraphicsManager::renderFrameToScreen() {
     uint32_t scaleX = screenWidth / CHIP8_WIDTH;
     uint32_t scaleY = screenHeight / CHIP8_HEIGHT;
 
-    renderer.setDrawColor(255, 165, 0, 255);
+    renderer.setDrawColor(0, 0, 0, 255);
     renderer.clear();
     renderer.setDrawColor(255, 255, 255, 255);
 

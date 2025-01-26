@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
         app/CHIP8.cpp
         app/Peripherials/KeyboardHandler.cpp
         app/Peripherials/GraphicsManager.cpp
+        app/Peripherials/AudioManager.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
