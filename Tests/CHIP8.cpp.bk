@@ -1,0 +1,508 @@
+#include "CHIP8Manager.h"
+#include <fstream>
+#include <iostream>
+#include <cstring>
+#include <stack>
+
+uint8_t CHIP8Manager::byteRand() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint16_t> dist(0, 255);
+    return static_cast<uint8_t>(dist(gen));
+}
+
+CHIP8Manager::CHIP8Manager(const char *title, uint32_t width, uint32_t height) : window(title, width, height,
+            SDL_WINDOW_RESIZABLE),
+    renderer(window.get()) {
+    screenHeight = height;
+    screenWidth = width;
+}
+
+CHIP8Manager::~CHIP8Manager() = default;
+
+bool CHIP8Manager::loadROM(const char *filename) {
+    memset(context.memory, 0, sizeof(context.memory));
+
+    std::ifstream file(filename);
+
+    if (!file) {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return false;
+    }
+
+    file.seekg(0, std::ios::end);
+    const uint32_t fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    if (ADDRESS_PROGRAM_START + fileSize > sizeof(context.memory)) {
+        std::cerr << "Error: File size (" << fileSize
+                  << " bytes) exceeds memory bounds." << std::endl;
+        return false;
+    }
+    std::cerr << "FILE SIZE IS OK FOR COPYING" << std::endl;
+
+    file.read(reinterpret_cast<char *>(&context.memory[ADDRESS_PROGRAM_START]), fileSize);
+
+    if (!file) {
+        std::cerr << "Error reading file: " << filename << std::endl;
+        return false;
+    }
+
+    loadFontToMemory();
+    context.PC = ADDRESS_PROGRAM_START;
+    context.sp = 0;
+    for (int i = 0; i < STACK_SIZE; i++) {
+        context.stack[i] = 0;
+    }
+
+
+    return true;
+}
+
+void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
+#ifndef SET_TEST
+    if (PCRegisterRecord == context.PC) {
+        std::cout << "Skipping instruction, PC hasn't changed." << std::endl;
+        return;
+    }
+    PCRegisterRecord = context.PC;
+#endif
+
+    if (forcedInstruction != 0x0000) {
+        instruction = forcedInstruction;
+    } else {
+        instruction = context.memory[context.PC] << 8 | context.memory[context.PC + 1];
+    }
+    std::cout << "Current Instruction: 0x" << std::hex << instruction << std::endl;
+    uint8_t Vy;
+    uint8_t Vx;
+    uint16_t value;
+
+    uint8_t VxAddress = (instruction & 0x0F00) >> 8;
+    uint8_t VyAddress = (instruction & 0x00F0) >> 4;
+
+    switch ((instruction & 0xF000) >> 12) {
+        case 0x0:
+            if (instruction == CLEAR_DISPLAY) {
+                renderer.setDrawColor(0, 0, 0, 255);
+                renderer.clear();
+                renderer.updateWindow();
+                context.PC += 2;
+            } else if (instruction == RET) {
+                context.sp--;
+                context.PC = context.stack[context.sp];
+                context.stack[context.sp] = 0;
+            } else {
+                std::cerr << "Error: Invalid Instruction" << std::endl;
+            }
+            break;
+
+        case JP_ADDR:
+            context.PC = instruction & 0x0FFF;
+            break;
+
+        case CALL_ADDR:
+            context.stack[context.sp] = context.PC + 2;
+            context.sp++;
+            context.PC = instruction & 0x0FFF;
+            break;
+
+        case SEVxByte:
+            Vx = context.V[VxAddress];
+            value = instruction & 0xFF;
+
+            if (Vx == value) {
+                context.PC += 2;
+            }
+            context.PC += 2;
+            break;
+
+        case SNE:
+            Vx = context.V[VxAddress];
+            value = instruction & 0xFF;
+            if (Vx != value) {
+                context.PC += 2;
+            }
+            context.PC += 2;
+            break;
+
+        case SEVxVy:
+            Vx = context.V[VxAddress];
+            Vy = context.V[VyAddress];
+            if (Vx == Vy) {
+                context.PC += 2;
+            }
+            context.PC += 2;
+
+            break;
+        case LOAD:
+            context.V[VxAddress] = instruction & 0xFF;
+            context.PC += 2;
+            break;
+        case ADDVxByte:
+            context.V[VxAddress] += (instruction & 0xFF);
+            context.PC += 2;
+            break;
+        case 0x8:
+            switch (instruction & 0xF) {
+                case INST_LOAD:
+                    context.V[VxAddress] = context.V[VyAddress];
+                    context.PC += 2;
+                    break;
+
+                case INST_OR:
+                    context.V[VxAddress] |= context.V[VyAddress];
+                    context.PC += 2;
+                    break;
+
+                case INST_AND:
+                    context.V[VxAddress] &= context.V[VyAddress];
+                    context.PC += 2;
+                    break;
+
+                case INST_XOR:
+                    context.V[VxAddress] ^= context.V[VyAddress];
+                    context.PC += 2;
+                    break;
+
+                case INST_ADD:
+                    Vx = context.V[VxAddress];
+                    Vy = context.V[VyAddress];
+                    value  = Vx + Vy;
+
+                    context.V[0xF] = value > 0xFF ? 1 : 0;
+                    context.V[VxAddress] = value & 0xff;
+                    context.PC += 2;
+                    break;
+
+                case INST_SUB:
+                    Vx = context.V[VxAddress];
+                    Vy = context.V[VyAddress];
+
+                    context.V[0xF] = Vx > Vy ? 1 : 0;
+                    context.V[VxAddress]-= context.V[VyAddress];
+                    context.PC += 2;
+                    break;
+
+                case INST_SHR:
+                    context.V[0xF] = context.V[VxAddress] & 0x01;
+                    context.V[VxAddress] >>=1;
+                    context.PC += 2;
+                    break;
+
+                case INST_SUBN:
+                    Vx = context.V[VxAddress];
+                    Vy = context.V[VyAddress];
+
+                    context.V[0xF] = Vy > Vx ? 1 : 0;
+                    context.V[VxAddress] = Vy - Vx;
+                    context.PC += 2;
+                    break;
+
+                case INST_SHL:
+                    context.V[0xF] = context.V[VxAddress] >> 7;
+                    context.V[VxAddress] <<= 1;
+                    context.PC += 2;
+                    break;
+                default:
+                    std::cerr << "Error: Invalid Instruction 0x" << std::hex << instruction << std::endl;
+                    break;
+            }
+            break;
+        case 0x9:
+            Vx = context.V[VxAddress];
+            Vy = context.V[VyAddress];
+            if (Vx != Vy) {
+                context.PC += 2;
+            }
+            context.PC += 2;
+            break;
+        case 0xA:
+            context.I = instruction & 0x0FFF;
+            context.PC += 2;
+            break;
+        case 0xB:
+            context.PC = context.V[0] + instruction & 0x0FFF;
+            break;
+        case RND:
+            context.V[VxAddress] = byteRand() & (instruction & 0xFF);
+            context.PC += 2;
+            break;
+        case DISP:
+            Vx = context.V[VxAddress];
+            Vy = context.V[VyAddress];
+            value = instruction & 0x000F;
+#ifdef SET_TEST
+                testSprite(0xD);
+                Vx = 30;
+                Vy = 20;
+                value = 5;
+#endif
+            drawToScreen(Vx, Vy, value);
+            context.PC += 2;
+            break;
+        case 0xE:
+            switch (instruction & 0xFF) {
+                case SKP:
+                    //todo  Skip next instruction if key with the value of Vx is pressed.
+                    // Here we should wait for a key to be pressed
+                    context.PC += 2;
+                    break;
+                case SKNP:
+                    /*
+                     * SKIP TO THE NEXT INSTRUCTION IF KEY IS NOT PRESSED
+                     * todo Implement the key range for the typical KEYPAD
+                     *  1,2,3,C ,
+                     *  4 5 6 D ,
+                     *  7 8 9 E ,
+                     *  A 0 B F
+                     *  This will be done on the keyboard, I will use EVENTS for this
+                     */
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 0xF:
+            switch (instruction & 0xFF) {
+                case 0x07:
+                    context.V[VxAddress] = context.timerRegister;
+                    context.PC += 2;
+                    break;
+
+                case 0x0A:
+                    /*
+                     todo Wait for a key press, store the value of the key in Vx.
+                        All execution stops until a key is pressed, then the value of that key is stored in
+                        Vx.
+                     */
+                    break;
+
+                case 0x15:
+                    context.timerRegister = context.V[VxAddress];
+                    context.PC += 2;
+                    break;
+
+                case 0x18:
+                    context.soundRegister = context.V[VxAddress];
+                    context.PC += 2;
+                    break;
+
+                case 0x1E:
+                    context.I += context.V[VxAddress];
+                    context.PC += 2;
+                    break;
+
+                case 0x29:
+                    Vx = context.V[VxAddress];
+                    context.I = FONT_START_ADDRESS + (FONT_BYTES * Vx);
+                    // todo
+                    //  Purpose: This is used to display a single hexadecimal digit (0–F) on the screen
+                    //  Use built-in font set in Memory which consists of 16 sprites
+                    //  I needs to point to the memory address where that sprite begins
+                    context.PC += 2;
+                    break;
+
+                case 0x33:
+                    context.memory[context.I] = context.V[VxAddress] / 100;
+                    context.memory[context.I + 1] = (context.V[VxAddress] / 10) % 10;
+                    context.memory[context.I + 2] = context.V[VxAddress] % 10;
+                    context.PC += 2;
+                    break;
+
+                case 0x55:
+                    for (uint8_t i = 0; i <= VxAddress; i++) {
+                        context.memory[context.I + i] = context.V[i];
+                    }
+                    context.PC += 2;
+                    break;
+                case 0x65:
+                    for (uint8_t i = 0; i <= VxAddress; i++) {
+                        context.V[i] = context.memory[context.I + i];
+                    }
+                    context.PC += 2;
+                    break;
+
+                default:
+                    std::cout << "Unknown operation: 0x" << std::hex << (instruction & 0xF) << std::dec << std::endl;
+                    break;
+            }
+            break;
+        default:
+            std::cout << "UNKNOWN INSTRUCTION: " <<std::hex << instruction << std::endl;
+            break;
+    }
+}
+
+
+void CHIP8Manager::handleEvents(SDL_Event *event, bool *exit) {
+    int keystate = 0;
+
+    while (SDL_PollEvent(event)) {
+        switch (event->type) {
+            case SDL_QUIT:
+                *exit = true;
+
+            case SDL_KEYDOWN:
+                if (event->key.keysym.sym == SDLK_RETURN) {
+                    // todo: Do something
+                }
+                keystate = 1;
+            // next instruction
+                break;
+            case SDL_KEYUP:
+                keystate = 0;
+            case SDL_WINDOWEVENT:
+                if (event->window.event == SDL_WINDOWEVENT_RESIZED) {
+                    screenWidth = event->window.data1;
+                    screenHeight = event->window.data2;
+                    std::cout << "Window resized to: " << screenWidth << "x" << screenHeight << std::endl;
+                }
+                break;
+            default:
+                break;
+        }
+
+        /*
+        Chip-8 ( Keypad Mapping to Keyboard )
+        Keypad             Keyboard
+        +-+-+-+-+          +-+-+-+-+
+        |1|2|3|C|          |1|2|3|4|
+        +-+-+-+-+          +-+-+-+-+
+        |4|5|6|D|          |Q|W|E|R|
+        +-+-+-+-+ <<<==>>> +-+-+-+-+
+        |7|8|9|E|          |A|S|D|F|
+        +-+-+-+-+          +-+-+-+-+
+        |A|0|B|F|          |Z|X|C|V|
+        +-+-+-+-+          +-+-+-+-+
+        */
+
+        switch (event->key.keysym.sym) {
+            case SDLK_ESCAPE:
+                *exit = true;
+                break;
+            case SDLK_1:
+                keys[0x1] = keystate;
+                break;
+            case SDLK_2:
+                keys[0x2] = keystate;
+                break;
+            case SDLK_3:
+                keys[0x3] = keystate;
+                break;
+            case SDLK_4:
+                keys[0xC] = keystate;
+                break;
+            case SDLK_q:
+                keys[0x4] = keystate;
+                break;
+            case SDLK_w:
+                keys[0x5] = keystate;
+                break;
+            case SDLK_e:
+                keys[0x6] = keystate;
+                break;
+            case SDLK_r:
+                keys[0xD] = keystate;
+            case SDLK_a:
+                keys[0x7] = keystate;
+                break;
+            case SDLK_s:
+                keys[0x8] = keystate;
+                break;
+            case SDLK_d:
+                keys[0x9] = keystate;
+                break;
+            case SDLK_f:
+                keys[0xE] = keystate;
+                break;
+            case SDLK_z:
+                keys[0xA] = keystate;
+                break;
+            case SDLK_x:
+                keys[0x0] = keystate;
+                break;
+            case SDLK_c:
+                keys[0xB] = keystate;
+                break;
+            case SDLK_v:
+                keys[0xF] = keystate;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+
+void CHIP8Manager::drawToScreen(uint8_t Vx, uint8_t Vy, uint8_t n) {
+    context.V[0x0F] = 0;
+    uint8_t nbits = 8 * sizeof(uint8_t);
+
+    for (uint8_t row = 0; row < n; row++) {
+        uint8_t spriteByte = context.memory[context.I + row];
+        for (uint8_t col = 0; col < nbits; col++) {
+            uint8_t spritePixel = (spriteByte >> (nbits - (1 + col))) & 0x1;
+
+            uint8_t pixelX = (Vx + col) % CHIP8_WIDTH;
+            uint8_t pixelY = (Vy + row) % CHIP8_HEIGHT;
+
+            uint8_t screenPixel = framebuffer[pixelY][pixelX];
+
+            if (spritePixel == 1 && screenPixel == 1) {
+                context.V[0xF] = 1;
+            }
+
+            framebuffer[pixelY][pixelX] ^= spritePixel;
+        }
+    }
+
+    renderFrameToScreen();
+}
+
+void CHIP8Manager::renderFrameToScreen() {
+    uint32_t scaleX = screenWidth / CHIP8_WIDTH;
+    uint32_t scaleY = screenHeight / CHIP8_HEIGHT;
+
+    renderer.setDrawColor(0, 0, 0, 255);
+    renderer.clear();
+    renderer.setDrawColor(255, 255, 255, 255);
+
+    SDL_Rect pixel;
+    for (uint8_t y = 0; y < CHIP8_HEIGHT; y++) {
+        for (uint8_t x = 0; x < CHIP8_WIDTH; x++) {
+            if (framebuffer[y][x] == 1) {
+                pixel.x = x * scaleX;
+                pixel.y = y * scaleY;
+                pixel.w = scaleX;
+                pixel.h = scaleY;
+                renderer.drawPixel(&pixel);
+            }
+        }
+    }
+
+    renderer.updateWindow();
+}
+
+void CHIP8Manager::clearVideoBuffer() {
+    // Reset framebuffer if necessary
+}
+
+void CHIP8Manager::testSprite(uint8_t val) {
+    uint8_t hex = val & 0x0F;
+    context.I = 0;
+    for (uint8_t i = 0; i < sizeof(font[hex]); i++) {
+        context.memory[context.I + i] = font[hex][i];
+    }
+}
+
+void CHIP8Manager::loadFontToMemory() {
+    uint8_t address = FONT_START_ADDRESS;
+    for (auto hex: font) {
+        for (uint8_t i = 0; i < FONT_BYTES; i++) {
+            // Each font character is 5 bytes
+            context.memory[address + i] = hex[i]; // Write the character data sequentially
+        }
+        address += FONT_BYTES;
+    }
+}
