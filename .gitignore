@@ -1,0 +1,14 @@
+# Ignore all common compression files
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.7z
+*.gz
+*.bz2
+*.xz
+*.zst
+
+/build/*
+!/build/SDL2.dll
