@@ -3,20 +3,18 @@
 
 #include <array>
 #include "../constants.h"
-#include "../SDLAbstractLayer/GraphicsDrivers.h"
+#include "../Drivers/GraphicsDrivers.h"
 
 class GraphicsManager {
-    SDLManager sdlManager;
-    Window window;
-    Renderer renderer;
+    QtRenderer *qtrenderer;
     uint32_t screenWidth, screenHeight;
     std::array<std::array<uint8_t, CHIP8_WIDTH>, CHIP8_HEIGHT> framebuffer = {};
     uint32_t width_;
 
 public:
-    explicit GraphicsManager(const char *title, const uint32_t width, const uint32_t height):
-        window(title, width, height, SDL_WINDOW_RESIZABLE),
-        renderer(window.get()), width_(width) {
+    explicit GraphicsManager(QtRenderer *qt_renderer, const uint32_t width, const uint32_t height):
+        qtrenderer(qt_renderer)
+    {
         screenWidth = width;
         screenHeight = height;
     }

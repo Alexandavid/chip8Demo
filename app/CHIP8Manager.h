@@ -1,9 +1,7 @@
 #ifndef CHIP8_MANAGER_H
 #define CHIP8_MANAGER_H
 
-#include <array>
 #include <cstdint>
-#include <random>
 #include "constants.h"
 #include "Peripherials/AudioManager.h"
 #include "Peripherials/GraphicsManager.h"
@@ -24,19 +22,18 @@ public:
 };
 
 class CHIP8Manager {
-public:
     CHIP8Specification context;
-private:
+    QtRenderer *renderer_;
     KeyboardHandler keypad;
     GraphicsManager gui;
     AudioManager audio;
     uint16_t instruction{};
-    uint16_t PCRegisterRecord = SDL_MAX_UINT16;
+    uint16_t PCRegisterRecord = 0xFFFF;
 
 public:
     bool systemStatus = RUNNING;
 
-    CHIP8Manager(const char *title, uint32_t width, uint32_t height, const char* soundfile);
+    CHIP8Manager(QtRenderer* renderer, uint32_t width, uint32_t height, const char* soundfile);
 
     ~CHIP8Manager();
 
@@ -50,13 +47,15 @@ public:
 
     void handleInstruction(uint16_t forcedInstruction = 0);
 
-    void handleEvents(bool *exit);
+    void handleEvents(QKeyEvent *event);
 
     void drawOnFrame(uint8_t Vx, uint8_t Vy, uint8_t n);
 
     void renderFrameToScreen();
 
     void handleSpecialRegisters();
+
+    CHIP8Specification *getChip8HardwareContext();
 
 private:
     void holdUntilClick(uint8_t VxAddress);

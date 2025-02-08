@@ -2,38 +2,23 @@
 #include "../CHIP8Manager.h"
 
 
-void KeyboardHandler::processInput(bool* exit, bool* systemStatus, GraphicsManager* graphics) {
-    int keystate = 0;
+void KeyboardHandler::processInput(QKeyEvent* qtEvent, bool* systemStatus, GraphicsManager* graphics) {
+    if (!qtEvent) return;
 
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
-            *exit = true;
+    int keystate = qtEvent->type() == QEvent::KeyPress;
+
+    switch (qtEvent->key()) {
+        case Qt::Key_1: case Qt::Key_2: case Qt::Key_3: case Qt::Key_4:
+        case Qt::Key_Q: case Qt::Key_W: case Qt::Key_E: case Qt::Key_R:
+        case Qt::Key_A: case Qt::Key_S: case Qt::Key_D: case Qt::Key_F:
+        case Qt::Key_Z: case Qt::Key_X: case Qt::Key_C: case Qt::Key_V:
+            *systemStatus = RUNNING;
+        break;
+        default:
             break;
-        }
-
-        if (event.type == SDL_KEYDOWN) {
-            keystate = 1;
-            switch (event.key.keysym.sym) {
-                case SDLK_1: case SDLK_2: case SDLK_3: case SDLK_4:
-                case SDLK_q: case SDLK_w: case SDLK_e: case SDLK_r:
-                case SDLK_a: case SDLK_s: case SDLK_d: case SDLK_f:
-                case SDLK_z: case SDLK_x: case SDLK_c: case SDLK_v:
-                    *systemStatus = RUNNING;
-                break;
-                default: break;
-            }
-        }
-        else if (event.type == SDL_KEYUP) {
-             keystate = 0;
-        }
-        else if (event.type == SDL_WINDOWEVENT) {
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                graphics->setDisplaySize(event.window.data1, event.window.data2);
-            }
-        }
-
-        mapKeyToChip8(event.key.keysym.sym, keystate);
     }
+
+    mapKeyToChip8(qtEvent, keystate);
 }
 
 
@@ -65,7 +50,7 @@ bool KeyboardHandler::wasKeyReleased(uint8_t key) const {
     return keys[key] == 0;
 }
 
-void KeyboardHandler::mapKeyToChip8(SDL_Keycode key, uint8_t state) {
+void KeyboardHandler::mapKeyToChip8(QKeyEvent* event, uint8_t state) {
     /*
          Chip-8 ( Keypad Mapping to Keyboard )
          Keypad             Keyboard
@@ -80,23 +65,23 @@ void KeyboardHandler::mapKeyToChip8(SDL_Keycode key, uint8_t state) {
          +-+-+-+-+          +-+-+-+-+
          */
 
-    switch (key) {
-        case SDLK_1: keys[0x1] = state; break;
-        case SDLK_2: keys[0x2] = state; break;
-        case SDLK_3: keys[0x3] = state; break;
-        case SDLK_4: keys[0xC] = state; break;
-        case SDLK_q: keys[0x4] = state; break;
-        case SDLK_w: keys[0x5] = state; break;
-        case SDLK_e: keys[0x6] = state; break;
-        case SDLK_r: keys[0xD] = state; break;
-        case SDLK_a: keys[0x7] = state; break;
-        case SDLK_s: keys[0x8] = state; break;
-        case SDLK_d: keys[0x9] = state; break;
-        case SDLK_f: keys[0xE] = state; break;
-        case SDLK_z: keys[0xA] = state; break;
-        case SDLK_x: keys[0x0] = state; break;
-        case SDLK_c: keys[0xB] = state; break;
-        case SDLK_v: keys[0xF] = state; break;
+    switch (event->key()) {
+        case Qt::Key_1: keys[0x1] = state; break;
+        case Qt::Key_2: keys[0x2] = state; break;
+        case Qt::Key_3: keys[0x3] = state; break;
+        case Qt::Key_4: keys[0xC] = state; break;
+        case Qt::Key_Q: keys[0x4] = state; break;
+        case Qt::Key_W: keys[0x5] = state; break;
+        case Qt::Key_E: keys[0x6] = state; break;
+        case Qt::Key_R: keys[0xD] = state; break;
+        case Qt::Key_A: keys[0x7] = state; break;
+        case Qt::Key_S: keys[0x8] = state; break;
+        case Qt::Key_D: keys[0x9] = state; break;
+        case Qt::Key_F: keys[0xE] = state; break;
+        case Qt::Key_Z: keys[0xA] = state; break;
+        case Qt::Key_X: keys[0x0] = state; break;
+        case Qt::Key_C: keys[0xB] = state; break;
+        case Qt::Key_V: keys[0xF] = state; break;
         default: break;
     }
 }

@@ -1,16 +1,16 @@
 #include "CHIP8Manager.h"
 #include <fstream>
-#include <functional>
 #include <iostream>
+#include <random>
 #include <Windows.h>
 #include <sys/stat.h>
 
 CHIP8Manager::CHIP8Manager(
-    const char *title
+    QtRenderer* renderer
     , uint32_t width
     , uint32_t height
     , const char* soundFile
-    ) : context(), gui(title, width, height), audio(soundFile) {}
+    ) : context(), gui(renderer, width, height), audio(soundFile) {}
 
 CHIP8Manager::~CHIP8Manager() = default;
 
@@ -255,8 +255,14 @@ void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
 
 
 void CHIP8Manager::handleSpecialRegisters() {
-    context.delayTimerRegister > 0 ? --context.delayTimerRegister : NULL;
+    if (context.delayTimerRegister > 0) {
+        --context.delayTimerRegister;
+    }
     context.soundRegister > 0 ? audio.playSound(&context.soundRegister, SND_FILENAME | SND_LOOP | SND_ASYNC) : audio.stopSound();
+}
+
+CHIP8Specification *CHIP8Manager::getChip8HardwareContext() {
+    return &context;
 }
 
 void CHIP8Manager::holdUntilClick(uint8_t regAddress) {
@@ -267,8 +273,8 @@ void CHIP8Manager::holdUntilClick(uint8_t regAddress) {
     }
 }
 
-void CHIP8Manager::handleEvents(bool *exit) {
-    keypad.processInput(exit, &systemStatus, &gui);
+void CHIP8Manager::handleEvents(QKeyEvent* event) {
+    keypad.processInput(event, &systemStatus, &gui);
 }
 
 void CHIP8Manager::drawOnFrame(uint8_t Vx, uint8_t Vy, uint8_t n) {

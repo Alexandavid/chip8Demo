@@ -6,6 +6,10 @@
 #define SUPER_CHIP_WIDTH 64 * 15
 #define SUPER_CHIP_HEIGHT 32 * 15
 
+#define ONE_SECOND 1000
+#define CHIP8_FREQUENCY 1000 //Hz
+#define SCREEN_REFRESH_RATE 60
+
 #define KB 1024
 #define MEMORY_SIZE 4 * KB
 
