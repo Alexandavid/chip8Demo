@@ -14,8 +14,7 @@ namespace Ui {
     class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -24,15 +23,15 @@ public:
     ~MainWindow();
 
 private:
-    QtRenderer* emulatorWidget;
+    QtRenderer *emulatorWidget;
     Ui::MainWindow *ui;
-    Chip8EmulatorQtWrapper* chip8QtWrapper;
+    Chip8EmulatorQtWrapper *chip8QtWrapper;
 
-    QStringListModel* registerModel;
-    QStringListModel* programCounterModel;
-    QStringListModel* MemoryListViewModel;
-    QStandardItemModel* RegisterTableModel;
-    QMap<int, QPushButton*> keyToButtonMap;
+    QStringListModel *registerModel;
+    QStringListModel *programCounterModel;
+    QStringListModel *MemoryListViewModel;
+    QStandardItemModel *RegisterTableModel;
+    QMap<int, QPushButton *> keyToButtonMap;
 
     void updateUI();
 
@@ -63,7 +62,6 @@ private:
     void connectButtonsToTheirOnCalls();
 
     void updateRegisters();
-
 };
 
 #endif // MAINWINDOW_H

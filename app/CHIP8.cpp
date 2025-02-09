@@ -7,11 +7,12 @@
 #include <sys/stat.h>
 
 CHIP8Manager::CHIP8Manager(
-    QtRenderer* renderer
+    QtRenderer *renderer
     , uint32_t width
     , uint32_t height
-    , const char* soundFile
-    ) : context(), gui(renderer, width, height), audio(soundFile) {}
+    , const char *soundFile
+) : context(), gui(renderer, width, height), audio(soundFile) {
+}
 
 CHIP8Manager::~CHIP8Manager() = default;
 
@@ -43,7 +44,7 @@ bool CHIP8Manager::loadROM(const char *filename) {
     loadFontToMemory();
     context.PC = ADDRESS_PROGRAM_START;
     context.sp = 0;
-    for (unsigned short & i : context.stack) {
+    for (unsigned short &i: context.stack) {
         i = 0;
     }
 
@@ -76,7 +77,7 @@ void CHIP8Manager::handleArithmetic(uint8_t VxAddress, uint8_t Vx, uint8_t Vy) {
             break;
 
         case INST_SUB:
-            context.V[VxAddress]-= Vy;
+            context.V[VxAddress] -= Vy;
             context.V[0xF] = Vy > Vx ? 0 : 1;
             break;
 
@@ -169,7 +170,6 @@ void CHIP8Manager::handleTimeAndMemory(uint8_t VxAddress, uint8_t Vx) {
 }
 
 void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
-
     if (forcedInstruction != 0x0000) {
         instruction = forcedInstruction;
     } else {
@@ -249,17 +249,16 @@ void CHIP8Manager::handleInstruction(uint16_t forcedInstruction) {
             handleTimeAndMemory(VxAddress, Vx);
             break;
         default:
-            std::cout << "UNKNOWN INSTRUCTION: " <<std::hex << instruction << std::endl;
+            std::cout << "UNKNOWN INSTRUCTION: " << std::hex << instruction << std::endl;
             break;
     }
 }
-
 
 void CHIP8Manager::handleSpecialRegisters() {
     if (context.delayTimerRegister > 0) {
         --context.delayTimerRegister;
     }
-    context.soundRegister > 0 ? audio.playSound(&context.soundRegister, SND_FILENAME | SND_LOOP | SND_ASYNC) : audio.stopSound();
+    context.soundRegister > 0 ? audio.playSound(&context.soundRegister) : audio.stopSound();
 }
 
 CHIP8Specification *CHIP8Manager::getChip8HardwareContext() {
@@ -274,7 +273,7 @@ void CHIP8Manager::holdUntilClick(uint8_t regAddress) {
     }
 }
 
-void CHIP8Manager::handleEvents(QKeyEvent* event) {
+void CHIP8Manager::handleEvents(QKeyEvent *event) {
     keypad.processInput(event, &systemStatus);
 }
 

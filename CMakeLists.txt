@@ -10,6 +10,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Widgets REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Multimedia)
 
 include_directories(
         C:/msys64/mingw64/include
@@ -34,6 +35,7 @@ target_link_libraries(${PROJECT_NAME}
         winmm
         Qt6::Core
         Qt6::Widgets
+        Qt6::Multimedia
 )
 
 ############################ Testing

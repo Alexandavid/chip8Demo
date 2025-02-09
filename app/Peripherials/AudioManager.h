@@ -5,17 +5,21 @@
 #define AUDIOMANAGER_H
 
 #include <stdint.h>
-#include <mem.h>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+
+#include <QUrl>
 
 class AudioManager {
     char soundfileName[50];
+    QMediaPlayer* player;
+    QAudioOutput* output;
 
  public:
-    AudioManager(const char* filename) {
-        memcpy(soundfileName, filename, sizeof(soundfileName));
-    };
+    AudioManager(const char* filename);
+    ~AudioManager();
 
-    void playSound(uint8_t *timer, long options) ;
+    void playSound(uint8_t *timer) ;
 
     void stopSound();
 };

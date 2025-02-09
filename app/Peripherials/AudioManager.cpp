@@ -6,18 +6,38 @@
 #include <Windows.h>
 #include <sys/stat.h>
 #include "AudioManager.h"
+#include <QSoundEffect>
 
 #include <cstdint>
 #include <string>
 
-void AudioManager::playSound(uint8_t* timer, long options) {
-    std::wstring wideSoundFileName = std::wstring(soundfileName, soundfileName + strlen(soundfileName));
+AudioManager::AudioManager(const char *filename) {
+    memcpy(soundfileName, filename, sizeof(soundfileName));
+    player = new QMediaPlayer;
+    output = new QAudioOutput;
 
-    // Play sound with the wide-character string
-    PlaySound(wideSoundFileName.c_str(), NULL, options);
+    player->setAudioOutput(output);
+    output->setVolume(0.5);
+}
+
+AudioManager::~AudioManager() {
+    delete player;
+    delete output;
+}
+
+void AudioManager::playSound(uint8_t *timer) {
+    if (!player) {
+        player = new QMediaPlayer;
+    }
+
+    QUrl url = QUrl::fromLocalFile(QString::fromStdString(soundfileName));
+    player->setSource(url);
+    player->play();
+
     (*timer)--;
 }
 
 void AudioManager::stopSound() {
-    PlaySound(NULL, NULL, NULL);
+    // PlaySound(NULL, NULL, NULL);
+    player->stop();
 }

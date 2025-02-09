@@ -9,30 +9,37 @@
 #include <QTimer>
 #include "Chip8Manager.h"
 
-class Chip8EmulatorQtWrapper: public QObject {
+class Chip8EmulatorQtWrapper : public QObject {
     Q_OBJECT
 
-    CHIP8Manager* chip8;
-    public:
-    explicit Chip8EmulatorQtWrapper(QObject* parent = nullptr, QtRenderer* renderer = nullptr);
-    void loadROM(const char* filename);
+    CHIP8Manager *chip8;
+
+public:
+    explicit Chip8EmulatorQtWrapper(QObject *parent = nullptr, QtRenderer *renderer = nullptr);
+
+    void loadROM(const char *filename);
+
     void handleInstruction();
+
     void handleEvents(QKeyEvent *event);
+
     void renderFrameToScreen();
+
     void handleSpecialRegisters();
-    bool* getSystemStatus();
 
-    CHIP8Manager* getChip8unwrapped();
+    bool *getSystemStatus();
 
-    public slots:
+    CHIP8Manager *getChip8unwrapped();
+
+public slots:
     void updateEmulation();
+
     void updateScreen();
 
 private:
-    QtRenderer* renderer;
+    QtRenderer *renderer;
     QTimer emulationTimer;
     QTimer screenTimer;
-    bool quit = false;
 };
 
 #endif //CHIP8EMULATOR_H

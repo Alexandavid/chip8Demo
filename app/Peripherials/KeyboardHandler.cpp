@@ -21,7 +21,6 @@ void KeyboardHandler::processInput(QKeyEvent* qtEvent, bool* systemStatus) {
     mapKeyToChip8(qtEvent, keystate);
 }
 
-
 void KeyboardHandler::wasAnyKeyPressed(bool* systemStatus, uint8_t* v, uint8_t address) const {
     *systemStatus = HALT;
     for (int key = 0; key < KEYCOUNT; key++) {
