@@ -5,9 +5,9 @@
 #ifndef CHIP8EMULATOR_H
 #define CHIP8EMULATOR_H
 
+#include <qpushbutton.h>
 #include <QTimer>
 #include "Chip8Manager.h"
-
 
 class Chip8EmulatorQtWrapper: public QObject {
     Q_OBJECT
@@ -20,6 +20,7 @@ class Chip8EmulatorQtWrapper: public QObject {
     void handleEvents(QKeyEvent *event);
     void renderFrameToScreen();
     void handleSpecialRegisters();
+    bool* getSystemStatus();
 
     CHIP8Manager* getChip8unwrapped();
 

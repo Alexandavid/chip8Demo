@@ -8,6 +8,7 @@
 #include "GraphicsManager.h"
 
 #include <QKeyEvent>
+#include <qpushbutton.h>
 
 class KeyboardHandler {
     public:
@@ -15,7 +16,7 @@ class KeyboardHandler {
 
     explicit KeyboardHandler() = default;
 
-    void processInput(QKeyEvent *qtEvent, bool *systemStatus, GraphicsManager *graphics);
+    void processInput(QKeyEvent *qtEvent, bool *systemStatus);
 
     bool wasKeyPressed(uint8_t key) const;
 

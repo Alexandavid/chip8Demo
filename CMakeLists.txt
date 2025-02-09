@@ -4,14 +4,12 @@ project(DemoChip8)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-#+++++++++++++ Inclusion of QT ++++++++++++++++++#
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Widgets REQUIRED)
-#+++++++++++++++++++++++++++++++++++++++++++++++++
 
 include_directories(
         C:/msys64/mingw64/include
@@ -29,6 +27,7 @@ add_executable(${PROJECT_NAME} WIN32
         app/Peripherials/AudioManager.cpp
         app/Qt/MainWindow.cpp
         app/Qt/mainwindow.ui
+        app/Qt/MacOS.qss
 )
 
 target_link_libraries(${PROJECT_NAME}

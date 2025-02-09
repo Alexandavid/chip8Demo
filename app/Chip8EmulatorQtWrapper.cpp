@@ -4,6 +4,8 @@
 
 #include "Chip8EmulatorQtWrapper.h"
 
+#include <QPushButton>
+
 #include "constants.h"
 
 Chip8EmulatorQtWrapper::Chip8EmulatorQtWrapper(QObject* parent, QtRenderer* renderer_) : QObject(parent), renderer(renderer_) {
@@ -41,6 +43,10 @@ void Chip8EmulatorQtWrapper::renderFrameToScreen() {
 
 void Chip8EmulatorQtWrapper::handleSpecialRegisters() {
     chip8->handleSpecialRegisters();
+}
+
+bool * Chip8EmulatorQtWrapper::getSystemStatus() {
+    return &chip8->systemStatus;
 }
 
 CHIP8Manager* Chip8EmulatorQtWrapper::getChip8unwrapped() {

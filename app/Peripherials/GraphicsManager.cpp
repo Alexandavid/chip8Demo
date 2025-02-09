@@ -1,9 +1,6 @@
 #include "GraphicsManager.h"
 
 #include <cstdint>
-#include <iostream>
-#include <ostream>
-#include <SDL2/SDL_rect.h>
 #include "../constants.h"
 
 void GraphicsManager::renderFrameToScreen() {
@@ -12,23 +9,17 @@ void GraphicsManager::renderFrameToScreen() {
 
     qtrenderer->setDrawColor(Qt::white);
 
-    SDL_Rect pixel;
-
     for (uint8_t y = 0; y < CHIP8_HEIGHT; y++) {
         for (uint8_t x = 0; x < CHIP8_WIDTH; x++) {
             if (framebuffer[y][x] == 1) {
-                pixel.x = x * scaleX;
-                pixel.y = y * scaleY;
-                pixel.w = scaleX;
-                pixel.h = scaleY;
-                qtrenderer->drawPixel(pixel.x, pixel.y, pixel.w, pixel.h);
+                int pixelX = x * scaleX;
+                int pixelY = y * scaleY;
+                qtrenderer->drawPixel(pixelX, pixelY, scaleX, scaleY);
             }
         }
     }
 
-
     qtrenderer->repaint();
-
 }
 
 void GraphicsManager::drawSprite(uint8_t* memory, uint8_t* V, uint16_t I,uint8_t Vx, uint8_t Vy, uint8_t n) {

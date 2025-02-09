@@ -1,6 +1,7 @@
 #include "CHIP8Manager.h"
 #include <fstream>
 #include <iostream>
+#include <QPushButton>
 #include <random>
 #include <Windows.h>
 #include <sys/stat.h>
@@ -274,7 +275,7 @@ void CHIP8Manager::holdUntilClick(uint8_t regAddress) {
 }
 
 void CHIP8Manager::handleEvents(QKeyEvent* event) {
-    keypad.processInput(event, &systemStatus, &gui);
+    keypad.processInput(event, &systemStatus);
 }
 
 void CHIP8Manager::drawOnFrame(uint8_t Vx, uint8_t Vy, uint8_t n) {

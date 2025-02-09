@@ -2,6 +2,8 @@
 #define CHIP8_MANAGER_H
 
 #include <cstdint>
+#include <qpushbutton.h>
+
 #include "constants.h"
 #include "Peripherials/AudioManager.h"
 #include "Peripherials/GraphicsManager.h"
@@ -33,7 +35,11 @@ class CHIP8Manager {
 public:
     bool systemStatus = RUNNING;
 
-    CHIP8Manager(QtRenderer* renderer, uint32_t width, uint32_t height, const char* soundfile);
+    CHIP8Manager(QtRenderer* renderer,
+        uint32_t width,
+        uint32_t height,
+        const char* soundfile
+    );
 
     ~CHIP8Manager();
 

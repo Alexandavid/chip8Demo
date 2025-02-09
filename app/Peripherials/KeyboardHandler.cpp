@@ -2,7 +2,7 @@
 #include "../CHIP8Manager.h"
 
 
-void KeyboardHandler::processInput(QKeyEvent* qtEvent, bool* systemStatus, GraphicsManager* graphics) {
+void KeyboardHandler::processInput(QKeyEvent* qtEvent, bool* systemStatus) {
     if (!qtEvent) return;
 
     int keystate = qtEvent->type() == QEvent::KeyPress;
