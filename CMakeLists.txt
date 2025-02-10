@@ -37,32 +37,14 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Multimedia
 )
 
-############################ Testing
-
-set(CPPUTEST_LIB_HOME C:/msys64/mingw64/lib/)
-
-if (NOT EXISTS ${CPPUTEST_LIB_HOME}/libCppUTest.a OR NOT EXISTS ${CPPUTEST_LIB_HOME}/libCppUTestExt.a)
-    message(FATAL_ERROR "CppUTest libraries not found in ${CPPUTEST_LIB_HOME}")
+# Packaging for GitHub release: To build the release, set the build type to 'Release'
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    message(STATUS "Building in Release mode")
+else()
+    message(STATUS "Building in Debug mode")
 endif()
 
-# Add Tests
-set(TEST_SOURCES
-        Tests/main.cpp
-        Tests/IntegrationTest.cpp
-)
 
-# Define to disable CppUTest's custom operator new
-
-# Define test executable
-add_definitions(-DCPPUTEST_MEMORY_LEAK_CHECKER_DISABLED)
-
-add_executable(UnitTests ${TEST_SOURCES})
-
-target_link_libraries(UnitTests
-        ${CPPUTEST_LIB_HOME}/libCppUTest.a
-        ${CPPUTEST_LIB_HOME}/libCppUTestExt.a
-)
-
-
-enable_testing()
-add_test(NAME RunTests COMMAND ${PROJECT_NAME}_tests)
+# Create the deployment package (these are necessary for the process)
+include(InstallRequiredSystemLibraries)
+include(CPack)
