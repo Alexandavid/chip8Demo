@@ -20,16 +20,14 @@ else()
     find_package(Qt6 REQUIRED COMPONENTS Multimedia)
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/app)
-
 set(HEADERS
         app/constants.h
         app/CHIP8Manager.h
         app/Chip8EmulatorQtWrapper.h
-        app/AudioManager.h
-        app/GraphicsManager.h
-        app/GraphicsDrivers.h
-        app/KeyboardHandler.h
+        app/Peripherials/AudioManager.h
+        app/Peripherials/GraphicsManager.h
+        app/Drivers/GraphicsDrivers.h
+        app/Peripherials/KeyboardHandler.h
 )
 
 set(SOURCES
@@ -43,20 +41,7 @@ set(SOURCES
         app/Qt/MainWindow.cpp
 )
 
-add_executable(${PROJECT_NAME} WIN32
-        app/main.cpp
-        app/Drivers/GraphicsDrivers.cpp
-        app/CHIP8.cpp
-        app/Chip8EmulatorQtWrapper.cpp
-        app/Peripherials/KeyboardHandler.cpp
-        app/Peripherials/GraphicsManager.cpp
-        app/Peripherials/AudioManager.cpp
-        app/Qt/MainWindow.cpp
-        app/Qt/mainwindow.ui
-)
-
-
-
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_link_libraries(${PROJECT_NAME}
