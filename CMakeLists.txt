@@ -22,11 +22,30 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/app)
 
+set(HEADERS
+        app/constants.h
+        app/CHIP8Manager.h
+        app/Chip8EmulatorQtWrapper.h
+        app/AudioManager.h
+        app/GraphicsManager.h
+        app/GraphicsDrivers.h
+        app/KeyboardHandler.h
+)
+
+set(SOURCES
+        app/main.cpp
+        app/Drivers/GraphicsDrivers.cpp
+        app/CHIP8.cpp
+        app/Chip8EmulatorQtWrapper.cpp
+        app/Peripherials/KeyboardHandler.cpp
+        app/Peripherials/GraphicsManager.cpp
+        app/Peripherials/AudioManager.cpp
+        app/Qt/MainWindow.cpp
+)
+
 add_executable(${PROJECT_NAME} WIN32
         app/main.cpp
         app/Drivers/GraphicsDrivers.cpp
-        app/constants.h
-        app/CHIP8Manager.h
         app/CHIP8.cpp
         app/Chip8EmulatorQtWrapper.cpp
         app/Peripherials/KeyboardHandler.cpp
@@ -35,6 +54,8 @@ add_executable(${PROJECT_NAME} WIN32
         app/Qt/MainWindow.cpp
         app/Qt/mainwindow.ui
 )
+
+
 
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
