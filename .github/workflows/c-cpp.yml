@@ -12,10 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Qt and build
-        uses: actions/setup-cmake@v2
-        with:
-          cmake-version: '3.22'
+#      - name: Set up Qt and build
+#        uses: actions/setup-cmake@v2
+#        with:
+#          cmake-version: '3.22'
 
       - name: Build the project
         run: |
