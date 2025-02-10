@@ -1,33 +1,25 @@
 #include "GraphicsManager.h"
 
 #include <cstdint>
-#include <iostream>
-#include <ostream>
-#include <SDL_rect.h>
 #include "../constants.h"
 
 void GraphicsManager::renderFrameToScreen() {
     uint32_t scaleX = screenWidth / CHIP8_WIDTH;
     uint32_t scaleY = screenHeight / CHIP8_HEIGHT;
 
-    renderer.setDrawColor(0, 0, 0, 255);
-    renderer.clear();
-    renderer.setDrawColor(255, 255, 255, 255);
+    qtrenderer->setDrawColor(Qt::white);
 
-    SDL_Rect pixel;
     for (uint8_t y = 0; y < CHIP8_HEIGHT; y++) {
         for (uint8_t x = 0; x < CHIP8_WIDTH; x++) {
             if (framebuffer[y][x] == 1) {
-                pixel.x = x * scaleX;
-                pixel.y = y * scaleY;
-                pixel.w = scaleX;
-                pixel.h = scaleY;
-                renderer.drawPixel(&pixel);
+                int pixelX = x * scaleX;
+                int pixelY = y * scaleY;
+                qtrenderer->drawPixel(pixelX, pixelY, scaleX, scaleY);
             }
         }
     }
 
-    renderer.updateWindow();
+    qtrenderer->repaint();
 }
 
 void GraphicsManager::drawSprite(uint8_t* memory, uint8_t* V, uint16_t I,uint8_t Vx, uint8_t Vy, uint8_t n) {
@@ -59,14 +51,7 @@ void GraphicsManager::clearVideoBuffer() {
 
 void GraphicsManager::clearDisplay() {
     clearVideoBuffer();
-    renderer.setDrawColor(0, 0, 0, 255);
-    renderer.clear();
-}
-
-void GraphicsManager::setDisplaySize(uint16_t width, uint16_t height) {
-    screenWidth = width;
-    screenHeight = height;
-    std::cout << "Window resized to: " << screenWidth << "x" << screenHeight << std::endl;
+    qtrenderer->clear();
 }
 
 

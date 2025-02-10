@@ -2,9 +2,16 @@
 #define CONSTANTS_H
 #include <cstdint>
 
+#define RELEASE 1
+#define PRESS 0
+
 // #define SET_TEST
 #define SUPER_CHIP_WIDTH 64 * 15
 #define SUPER_CHIP_HEIGHT 32 * 15
+
+#define ONE_SECOND 1000
+#define CHIP8_FREQUENCY 1000 //Hz
+#define SCREEN_REFRESH_RATE 60
 
 #define KB 1024
 #define MEMORY_SIZE 4 * KB
@@ -17,13 +24,11 @@
 #define DISPLAY_SIZE_ETI_V1 (64*48)
 #define DISPLAY_SIZE_ETI_V2 (64*64)
 
-
 #define STACK_SIZE 16
 #define NUM_OF_REGISTER 16
 
 #define HALT false
 #define RUNNING true
-
 
 #define CLEAR_DISPLAY 0x00E0
 #define RET 0x00EE

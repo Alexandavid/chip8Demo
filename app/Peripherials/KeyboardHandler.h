@@ -2,19 +2,21 @@
 #define KEYBOARDHANDLER_H
 
 #include <array>
-#include <SDL.h>
 #include <cstdint>
 
 #include "../constants.h"
 #include "GraphicsManager.h"
 
+#include <QKeyEvent>
+#include <qpushbutton.h>
+
 class KeyboardHandler {
+    public:
     std::array<uint8_t, KEYCOUNT> keys{};
-    SDL_Event event;
-public:
+
     explicit KeyboardHandler() = default;
 
-    void processInput(bool *exit, bool *systemStatus, GraphicsManager *graphics);
+    void processInput(QKeyEvent *qtEvent, bool *systemStatus);
 
     bool wasKeyPressed(uint8_t key) const;
 
@@ -25,7 +27,7 @@ public:
     bool wasAnyKeyPressed() const;
 
 private:
-    void mapKeyToChip8(SDL_Keycode key, uint8_t state);
+    void mapKeyToChip8(QKeyEvent *event, uint8_t state);
 };
 
 #endif
