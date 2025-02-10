@@ -27,6 +27,6 @@ jobs:
       - name: Upload release binaries
         uses: softprops/action-gh-release@v1
         with:
-          files: build/your_binary_or_exe_file
+          files: build/DemoChip8.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
