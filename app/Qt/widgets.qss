@@ -1,0 +1,214 @@
+/* Overall QWidget Styling */
+QWidget {
+    background-color: #222222;
+    color: white;
+    font-family: 'Arial', sans-serif;
+}
+
+/* QMainWindow and central widget */
+QMainWindow {
+    background-color: #222222;
+}
+
+QWidget#centralwidget {
+    background-color: #222222;
+}
+
+/* QTabWidget Styling */
+QTabWidget::pane {
+    border: 2px solid #444;
+    border-radius: 5px;
+    background-color: #2b2b2b;
+}
+
+QTabBar::tab {
+    background: #3c3f41;
+    color: white;
+    padding: 8px;
+    border: 1px solid #555;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+QTabBar::tab:selected {
+    background: #5a5d60;
+    border-bottom: 2px solid #FF9900;
+}
+
+/* QPushButton Styling */
+QPushButton {
+    background-color: #444;
+    color: white;
+    border: 2px solid #666;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #5a5d60;
+    border-color: #FF9900;
+}
+
+QPushButton:pressed {
+    background-color: #FF9900;
+    color: black;
+    border-color: #FF6600;
+}
+
+/* QFrame Styling */
+QFrame {
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+
+/* QTableView Styling */
+QTableView {
+    background-color: #2b2b2b;
+    color: white;
+    border: 1px solid #444;
+    alternate-background-color: #333; /* For alternating row colors */
+    selection-background-color: #FF9900;
+    selection-color: black;
+    gridline-color: #444; /* Subtle gridlines between cells */
+    corner-button: hidden; /* Hide corner button for cleaner look */
+    resize-mode: interactive; /* Allow user to resize columns interactively */
+}
+
+QTableView::item {
+    padding: 8px;
+    border: 1px solid transparent; /* Ensures cells have spacing between them */
+    min-width: 100px; /* Minimum width for each column */
+}
+
+QTableView::item:selected {
+    background-color: #FF9900;
+    color: black;
+    border: 1px solid #FF9900; /* Highlight selected cell border */
+}
+
+/* Header View Styling */
+QHeaderView {
+    background-color: #444;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #555;
+    padding: 5px;
+    min-width: 100px; /* Ensure header columns match cell widths */
+}
+
+QHeaderView::section {
+    background-color: #444;
+    color: white;
+    padding: 8px;
+    border: 1px solid #555;
+    text-align: center; /* Center-align column headers */
+}
+
+QHeaderView::section:checked {
+    background-color: #5a5d60; /* For selected columns in header */
+}
+
+QHeaderView::section:horizontal {
+    border-left: 1px solid #555;
+}
+
+QHeaderView::section:vertical {
+    border-top: 1px solid #555;
+}
+
+/* Ensure columns are stretched evenly */
+QHeaderView::section:horizontal {
+    resize-mode: stretch; /* This ensures column headers stretch to fill available space */
+}
+
+/* Focused QTableView Item */
+QTableView::item:focus {
+    background-color: #5a5d60;
+    color: white;
+    border: 1px solid #FF9900;
+}
+
+/* For corner button */
+QTableView QTableCornerButton::section {
+    background-color: #444;
+    border: 1px solid #555;
+}
+
+
+/* QTreeWidget Styling */
+QTreeWidget {
+    background-color: #2b2b2b;
+    color: white;
+    border: 1px solid #444;
+    selection-background-color: #FF9900;
+    selection-color: black;
+}
+
+QTreeWidget::item {
+    padding: 5px;
+}
+
+QTreeWidget::item:selected {
+    background-color: #FF9900;
+    color: black;
+    border-radius: 3px;
+}
+
+QHeaderView::section {
+    background-color: #444;
+    color: white;
+    padding: 5px;
+    border: 1px solid #555;
+}
+
+/* QLineEdit, QTextEdit Styling */
+QLineEdit, QTextEdit {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+QLineEdit:focus, QTextEdit:focus {
+    border-color: #FF9900;
+}
+
+/* QListView Styling */
+QListView {
+    background-color: #2b2b2b;
+    color: white;
+    border: 1px solid #444;
+    selection-background-color: #FF9900;
+    selection-color: black;
+}
+
+/* Native QWidget Styling */
+QWidget[native="true"] {
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+}
+
+/* Keypad (QPushButton inside) */
+QPushButton {
+    background-color: #444;
+    color: white;
+    border: 2px solid #666;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 20px;
+}
+
+QPushButton:hover {
+    background-color: #5a5d60;
+    border-color: #FF9900;
+}
+
+QPushButton:pressed {
+    background-color: #FF9900;
+    color: black;
+    border-color: #FF6600;
+}

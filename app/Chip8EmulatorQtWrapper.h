@@ -11,30 +11,29 @@
 
 class Chip8EmulatorQtWrapper : public QObject {
     Q_OBJECT
-
     CHIP8Manager *chip8;
 
 public:
     explicit Chip8EmulatorQtWrapper(QObject *parent = nullptr, QtRenderer *renderer = nullptr);
 
-    void loadROM(const char *filename);
+    void loadROM(const char *filename) const;
 
-    void handleInstruction();
+    void handleInstruction() const;
 
-    void handleEvents(QKeyEvent *event);
+    void handleEvents(QKeyEvent *event) const;
 
-    void renderFrameToScreen();
+    void renderFrameToScreen() const;
 
-    void handleSpecialRegisters();
+    void handleSpecialRegisters() const;
 
-    bool *getSystemStatus();
+    bool *getSystemStatus() const;
 
-    CHIP8Manager *getChip8unwrapped();
+    CHIP8Manager *getChip8unwrapped() const;
 
 public slots:
-    void updateEmulation();
+    void updateEmulation() const;
 
-    void updateScreen();
+    void updateScreen() const;
 
 private:
     QtRenderer *renderer;

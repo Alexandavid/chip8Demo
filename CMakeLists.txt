@@ -28,7 +28,6 @@ add_executable(${PROJECT_NAME} WIN32
         app/Peripherials/AudioManager.cpp
         app/Qt/MainWindow.cpp
         app/Qt/mainwindow.ui
-        app/Qt/MacOS.qss
 )
 
 target_link_libraries(${PROJECT_NAME}

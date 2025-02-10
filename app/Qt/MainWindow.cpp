@@ -5,9 +5,10 @@
 #include <iostream>
 #include "ui_mainwindow.h"
 
+#include <QDir>
+
 #define RELEASE 1
 #define PRESS 0
-
 
 MainWindow::MainWindow(QWidget* parent) :
     QMainWindow(parent),
@@ -26,7 +27,17 @@ MainWindow::MainWindow(QWidget* parent) :
     ui->Emulator->layout()->addWidget(emulatorWidget);
 
     chip8QtWrapper = new Chip8EmulatorQtWrapper(this, emulatorWidget);
-    chip8QtWrapper->loadROM("../games/UFO.ch8");
+
+    populateTabsWidgets();
+
+    if (!ui->Console->layout()) {
+        ui->Console->setLayout(new QVBoxLayout);
+    }
+    ui->Console->setReadOnly(true);
+    ui->Console->setStyleSheet("background-color: #222222; color: white; border: 1px solid #444;");
+    ui->Console->setFont(QFont("Courier", 10));
+
+    chip8QtWrapper->loadROM("../roms/4-flags.ch8");
 
     setupModels();
 
@@ -35,14 +46,69 @@ MainWindow::MainWindow(QWidget* parent) :
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateUI);
-    timer->start(100);
+    connect(ui->gamesListWidget, &QTreeWidget::itemClicked, this, &MainWindow::onGamesSelected);
+    connect(ui->romsListWidget, &QTreeWidget::itemClicked, this, &MainWindow::onRomSelected);
+    timer->start(16);
 
+    // Inside MainWindow constructor
+    QTimer *focusTimer = new QTimer(this);
+    connect(focusTimer, &QTimer::timeout, this, &MainWindow::checkFocusAndReset);
+    focusTimer->start(100);
+
+
+    qInstallMessageHandler([](QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+           QString output;
+
+           switch (type) {
+               case QtDebugMsg:
+                   output = QString("DEBUG: %1").arg(msg);
+                   break;
+               case QtWarningMsg:
+                   output = QString("WARNING: %1").arg(msg);
+                   break;
+               case QtCriticalMsg:
+                   output = QString("CRITICAL: %1").arg(msg);
+                   break;
+               case QtFatalMsg:
+                   output = QString("FATAL: %1").arg(msg);
+                   abort(); // Call abort to terminate on fatal error
+           }
+
+           // Print the message to the console
+           MainWindow *mainWin = qobject_cast<MainWindow *>(QApplication::activeWindow());
+           if (mainWin) {
+               mainWin->printToConsole(output);
+           }
+       });
+
+
+    qDebug() << "Test" ;
+    qCritical() << "OH NO";
 }
 
 MainWindow::~MainWindow() {
     delete ui;
     delete registerModel;
+    delete MemoryListViewModel;
+    delete programCounterModel;
+    delete RegisterTableModel;
     delete chip8QtWrapper;
+}
+
+void MainWindow::printToConsole(const QString &text)
+{
+    ui->Console->appendPlainText(text);
+
+    QTextCursor cursor = ui->Console->textCursor();
+    cursor.movePosition(QTextCursor::End);
+    ui->Console->setTextCursor(cursor);
+    ui->Console->ensureCursorVisible();
+}
+
+void MainWindow::checkFocusAndReset() {
+    if (!ui->H1->hasFocus()) {
+        ui->H1->setFocus();
+    }
 }
 
 void MainWindow::updateUI() {
@@ -138,7 +204,7 @@ void MainWindow::viewMemoryValues() {
 
 void MainWindow::keyPressEvent(QKeyEvent* event) {
     chip8QtWrapper->handleEvents(event);
-
+    qDebug() << "Key Pressed: " << event->key();
     if (keyToButtonMap.contains(event->key())) {
         QPushButton* button = keyToButtonMap.value(event->key());
         if (button) {
@@ -153,7 +219,7 @@ void MainWindow::StyleYourButton(QPushButton* button, bool style) {
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event) {
     chip8QtWrapper->handleEvents(event);
-
+    qDebug() << "Key Pressed: " << event->key();
     if (keyToButtonMap.contains(event->key())) {
         QPushButton* button = keyToButtonMap.value(event->key());
         if (button) {
@@ -171,12 +237,15 @@ void MainWindow::onButtonReleased() {
 }
 
 void MainWindow::setButtonAction(int type) {
+
     QPushButton* keypadButtonClicked = qobject_cast<QPushButton*>(sender());
 
     if (keypadButtonClicked) {
         QMap<int, QPushButton*>::key_type key = keyToButtonMap.key(keypadButtonClicked);
+        qDebug() << "Key Pressed: " << key;
         if (key != -1) {
             if (type == PRESS) {
+                keypadButtonClicked->setFocus();
                 keypadButtonClicked->setStyleSheet("background-color: #FFCC00; border: 2px solid #FF9900;");
                 QKeyEvent keyEvent(QEvent::KeyPress, key, Qt::NoModifier);
                 chip8QtWrapper->handleEvents(&keyEvent);
@@ -207,3 +276,37 @@ void MainWindow::connectButtonsToTheirOnCalls() {
     }
 }
 
+void MainWindow::onRomSelected(QTreeWidgetItem *item, int colum) {
+    QString filePath = item->data(0, Qt::UserRole).toString();
+    chip8QtWrapper->loadROM(filePath.toUtf8().data());
+}
+
+void MainWindow::onGamesSelected(QTreeWidgetItem *item, int colum) {
+    QString filePath = item->data(0, Qt::UserRole).toString();
+    chip8QtWrapper->loadROM(filePath.toUtf8().data());
+}
+
+void MainWindow::populateTabsWidgets() {
+    ui->tabWidget->setTabText(0, "Games");
+    ui->tabWidget->setTabText(1, "Roms");
+
+
+    QDir dirGames("../games/");
+    QStringList filters;
+    filters << "*.ch8" << "*.rom";
+    QStringList fileList = dirGames.entryList(filters, QDir::Files);
+
+    for (const QString &file : fileList) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(ui->gamesListWidget);
+        item->setText(0, file);
+        item->setData(0, Qt::UserRole, dirGames.absoluteFilePath(file));
+    }
+    QDir dirRoms("../roms/");
+    fileList = dirRoms.entryList(filters, QDir::Files);
+
+    for (const QString &file : fileList) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(ui->romsListWidget);
+        item->setText(0, file);
+        item->setData(0, Qt::UserRole, dirRoms.absoluteFilePath(file));
+    }
+}

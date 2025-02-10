@@ -7,6 +7,7 @@
 
 #include <QStringListModel>
 #include <QStandardItemModel>
+#include <qtreewidget.h>
 #include <app/Chip8EmulatorQtWrapper.h>
 #include <app/Drivers/GraphicsDrivers.h>
 
@@ -18,9 +19,15 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
+    void populateTabsWidgets();
+
     explicit MainWindow(QWidget *parent = nullptr);
 
+    void checkFocusAndReset();
+
     ~MainWindow();
+
+    void printToConsole(const QString &text);
 
 private:
     QtRenderer *emulatorWidget;
@@ -60,6 +67,11 @@ private:
     void createQtButtonMapping();
 
     void connectButtonsToTheirOnCalls();
+
+    void onRomSelected(QTreeWidgetItem *item, int colum);
+
+    void onGamesSelected(QTreeWidgetItem *item, int colum);
+
 
     void updateRegisters();
 };

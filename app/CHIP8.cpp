@@ -47,6 +47,7 @@ bool CHIP8Manager::loadROM(const char *filename) {
     for (unsigned short &i: context.stack) {
         i = 0;
     }
+    gui.clearDisplay();
 
     return true;
 }

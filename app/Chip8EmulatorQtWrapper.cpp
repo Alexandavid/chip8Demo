@@ -26,39 +26,39 @@ Chip8EmulatorQtWrapper::Chip8EmulatorQtWrapper(QObject *parent, QtRenderer *rend
 }
 
 
-void Chip8EmulatorQtWrapper::loadROM(const char *filename) {
+void Chip8EmulatorQtWrapper::loadROM(const char *filename) const {
     chip8->loadROM(filename);
 }
 
-void Chip8EmulatorQtWrapper::handleInstruction() {
+void Chip8EmulatorQtWrapper::handleInstruction() const {
     chip8->handleInstruction();
 }
 
-void Chip8EmulatorQtWrapper::handleEvents(QKeyEvent *event) {
+void Chip8EmulatorQtWrapper::handleEvents(QKeyEvent *event) const {
     chip8->handleEvents(event);
 }
 
-void Chip8EmulatorQtWrapper::renderFrameToScreen() {
+void Chip8EmulatorQtWrapper::renderFrameToScreen() const {
     chip8->renderFrameToScreen();
 }
 
-void Chip8EmulatorQtWrapper::handleSpecialRegisters() {
+void Chip8EmulatorQtWrapper::handleSpecialRegisters() const {
     chip8->handleSpecialRegisters();
 }
 
-bool *Chip8EmulatorQtWrapper::getSystemStatus() {
+bool *Chip8EmulatorQtWrapper::getSystemStatus() const {
     return &chip8->systemStatus;
 }
 
-CHIP8Manager *Chip8EmulatorQtWrapper::getChip8unwrapped() {
+CHIP8Manager *Chip8EmulatorQtWrapper::getChip8unwrapped() const {
     return chip8;
 }
 
-void Chip8EmulatorQtWrapper::updateEmulation() {
+void Chip8EmulatorQtWrapper::updateEmulation() const {
     handleInstruction();
 }
 
-void Chip8EmulatorQtWrapper::updateScreen() {
+void Chip8EmulatorQtWrapper::updateScreen() const {
     renderFrameToScreen();
     handleSpecialRegisters();
 }

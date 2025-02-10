@@ -8,7 +8,7 @@
 
 
 void loadStyleSheet(QApplication &app) {
-    QFile file("Qt/macos.qss");
+    QFile file("C:/Users/Xandr/CLionProjects/chip8Demo/app/Qt/widgets.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&file);
         QString styleSheet = stream.readAll();
