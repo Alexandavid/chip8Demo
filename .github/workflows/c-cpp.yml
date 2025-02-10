@@ -9,8 +9,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Qt
+      - uses: jurplel/install-qt-action@v4
+
       - name: Checkout code
         uses: actions/checkout@v2
+
 
 #      - name: Set up Qt and build
 #        uses: actions/setup-cmake@v2
