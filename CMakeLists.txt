@@ -30,12 +30,26 @@ add_executable(${PROJECT_NAME} WIN32
         app/Qt/mainwindow.ui
 )
 
-target_link_libraries(${PROJECT_NAME}
-        winmm
-        Qt6::Core
-        Qt6::Widgets
-        Qt6::Multimedia
-)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_link_libraries(${PROJECT_NAME}
+            winmm
+            Qt5::Core
+            Qt5::Widgets
+            Qt5::Multimedia
+    )
+    message(STATUS "Building in Release mode")
+else()
+    target_link_libraries(${PROJECT_NAME}
+            winmm
+            Qt6::Core
+            Qt6::Widgets
+            Qt6::Multimedia
+    )
+    message(STATUS "Building in Debug mode")
+endif()
+
+
 
 # Packaging for GitHub release: To build the release, set the build type to 'Release'
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
