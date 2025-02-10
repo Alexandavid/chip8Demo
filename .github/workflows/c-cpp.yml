@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # This matches any version tag like v1.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Qt and build
+        uses: actions/setup-cmake@v2
+        with:
+          cmake-version: '3.22'
+
+      - name: Build the project
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build .
+
+      - name: Upload release binaries
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/your_binary_or_exe_file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
