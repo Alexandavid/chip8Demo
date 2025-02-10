@@ -8,9 +8,18 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Widgets REQUIRED)
-find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    find_package(Qt5Core REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5 REQUIRED COMPONENTS Multimedia)
+
+else()
+    find_package(Qt6Core REQUIRED)
+    find_package(Qt6Widgets REQUIRED)
+    find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+endif()
+
 
 include_directories(
         C:/msys64/mingw64/include
