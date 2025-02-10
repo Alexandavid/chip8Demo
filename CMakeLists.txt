@@ -21,15 +21,13 @@ else()
 endif()
 
 
-include_directories(
-        C:/msys64/mingw64/include
-        ${SDL2_INCLUDE_DIR}
-)
+include_directories(${CMAKE_SOURCE_DIR}/app)
 
 add_executable(${PROJECT_NAME} WIN32
         app/main.cpp
         app/Drivers/GraphicsDrivers.cpp
         app/constants.h
+        app/CHIP8Manager.h
         app/CHIP8.cpp
         app/Chip8EmulatorQtWrapper.cpp
         app/Peripherials/KeyboardHandler.cpp
