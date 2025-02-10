@@ -20,8 +20,7 @@ else()
     find_package(Qt6 REQUIRED COMPONENTS Multimedia)
 endif()
 
-
-include_directories(${CMAKE_SOURCE_DIR}/app)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/app)
 
 add_executable(${PROJECT_NAME} WIN32
         app/main.cpp
